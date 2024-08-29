@@ -4,59 +4,49 @@ import me.ntrrgc.tsGenerator.VoidType
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
- open class TypeScriptGeneratorPlugin : Plugin<Project> {
+open class TypeScriptGeneratorPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
-
         project.extensions.create("typescriptGenerator", TypeScriptGeneratorExtension::class.java)
 
-        project.afterEvaluate({
+        project.afterEvaluate {
+            val config = checkNotNull(project.extensions.findByType(TypeScriptGeneratorExtension::class.java))
 
-            val config = project.extensions.findByType(TypeScriptGeneratorExtension::class.java)!!
+            project
+                .tasks
+                .create("generateTypescriptDefinitions", TypeScriptGeneratorTask::class.java)
+                .apply {
 
-            project.tasks.create("generateTypescriptDefinitions", TypeScriptGeneratorTask::class.java).apply {
+                    description = "Generates Typescript definitions from Kotlin classes."
 
-                description = "Generates Typescript definitions from Kotlin classes."
+                    outputPath = config.outputPath ?: throw IncompletePluginConfigurationException("outputPath")
 
-                outputPath = config.outputPath ?: throw IncompletePluginConfigurationException(
-                    "outputPath"
-                )
+                    classPath = config.classPath ?: throw IncompletePluginConfigurationException("classPath")
 
-                classPath = config.classPath ?: throw IncompletePluginConfigurationException(
-                    "classPath"
-                )
+                    packageName = config.packageName ?: throw IncompletePluginConfigurationException("packageName")
 
-                packageName = config.packageName ?: throw IncompletePluginConfigurationException(
-                    "packageName"
-                )
+                    typeMappings = config.typeMappings
 
-                typeMappings = config.typeMappings
+                    postfixFilters = config.postfixFilters
 
-                postfixFilters = config.postfixFilters
+                    imports = config.imports
 
-                imports = config.imports
+                    intTypeName = config.intTypeName
 
-                intTypeName = config.intTypeName
-
-                voidType = when (config.voidType) {
-                    "UNDEFINED" -> VoidType.UNDEFINED
-                    "NULL" -> VoidType.NULL
-                    else -> throw InvalidPluginConfigurationException(
-                        "voidType", "'NULL', or 'UNDEFINED'"
-                    )
+                    voidType = when (config.voidType) {
+                        "UNDEFINED" -> VoidType.UNDEFINED
+                        "NULL" -> VoidType.NULL
+                        else -> throw InvalidPluginConfigurationException("voidType", "'NULL', or 'UNDEFINED'")
+                    }
                 }
-            }
-
-        })
-
+        }
     }
 
-    class IncompletePluginConfigurationException(missing: String) : IllegalArgumentException(
+    class IncompletePluginConfigurationException(missing: String): IllegalArgumentException(
         "Incomplete TypescriptGenerator plugin configuration: $missing is missing"
     )
 
-    class InvalidPluginConfigurationException(input: String, expected: String) : IllegalArgumentException(
+    class InvalidPluginConfigurationException(input: String, expected: String): IllegalArgumentException(
         "Incomplete TypescriptGenerator plugin configuration: $input is invalid. Expected: $expected."
     )
-
 }

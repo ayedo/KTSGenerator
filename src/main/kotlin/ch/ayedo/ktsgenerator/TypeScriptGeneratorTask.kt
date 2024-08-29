@@ -12,8 +12,6 @@ import org.gradle.api.tasks.TaskAction
 import java.net.URLClassLoader
 import java.nio.file.Path
 
-
-@Suppress("UnstableApiUsage")
 open class TypeScriptGeneratorTask : DefaultTask() {
 
     @OutputFile
@@ -42,22 +40,22 @@ open class TypeScriptGeneratorTask : DefaultTask() {
 
     @TaskAction
     fun generateTypescriptDefinitions() {
-
-        val urls = classPath.files.map({ it.toURI().toURL() })
+        val urls = classPath.files.map { it.toURI().toURL() }
 
         val classLoader = URLClassLoader(urls.toTypedArray())
 
+        @Suppress("UnstableApiUsage")
         val javaClasses = ClassPath.from(classLoader).getTopLevelClassesRecursive(packageName)
 
-        val kotlinClasses = javaClasses
-            .map({ it.load() })
-            .map({ it.kotlin })
+        @Suppress("UnstableApiUsage")
+        val kotlinClasses = javaClasses.map { it.load() }.map { it.kotlin }
 
         val filteredKotlinClasses =
             if (postfixFilters.isNotEmpty()) {
-                kotlinClasses.filter({ kotlinClass ->
-                    postfixFilters.any({ kotlinClass.simpleName!!.endsWith(it) })
-                })
+                kotlinClasses
+                    .filter { kotlinClass ->
+                        postfixFilters.any { kotlinClass.simpleName?.endsWith(it) ?: false}
+                    }
             } else {
                 kotlinClasses
             }
@@ -79,16 +77,14 @@ open class TypeScriptGeneratorTask : DefaultTask() {
         )
 
         val result =
-            if (imports.isEmpty())
+            if (imports.isEmpty()) {
                 generator.definitionsText
-            else
-                imports.joinToString("\n") +
-                        "\n\n" +
-                        generator.definitionsText
+            } else {
+                imports.joinToString("\n") + "\n\n" + generator.definitionsText
+            }
 
         outputPath.toFile().writeText(result)
 
         println(outputPath)
-
     }
 }
