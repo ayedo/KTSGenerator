@@ -82,7 +82,5 @@ open class TypeScriptGeneratorTask : DefaultTask() {
             }
 
         outputPath.toFile().writeText(result)
-
-        println(outputPath)
     }
 }

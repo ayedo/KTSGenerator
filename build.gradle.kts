@@ -2,25 +2,15 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     `kotlin-dsl`
-    // `java-gradle-plugin`
-    // TODO: id("com.gradle.plugin-publish") version "0.10.0"
+    id("com.gradle.plugin-publish") version "1.2.2"
 }
 
 group = "ayedo"
-version = "2.1.0"
+version = "2.2.0"
 
 repositories {
     mavenCentral()
-    maven {
-        url = uri("https://jitpack.io")
-    }
-}
-
-tasks.test {
-    useJUnitPlatform()
-    testLogging {
-        events("passed", "skipped", "failed")
-    }
+    maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
@@ -33,24 +23,37 @@ dependencies {
     testImplementation("org.junit.jupiter","junit-jupiter-engine", junitVersion)
 }
 
-/* tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
-} */
+tasks {
+    withType<KotlinCompile> {
+        kotlinOptions.jvmTarget = "11"
+    }
 
-gradlePlugin {
-    plugins {
-        create("ktsgenerator") {
-            id = "ch.ayedo.ktsgenerator"
-            displayName = "ktsgenerator"
-            description = "Plugin to generate Typescript definitions from Kotlin classes."
-            version = version
-            implementationClass = "ch.ayedo.ktsgenerator.TypeScriptGeneratorPlugin"
+    test {
+        useJUnitPlatform()
+
+        testLogging {
+            events("passed", "skipped", "failed")
         }
     }
 }
 
-/* TODO: pluginBundle {
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+gradlePlugin {
     website = "https://github.com/ayedo/ktsgenerator"
     vcsUrl = "https://github.com/ayedo/ktsgenerator.git"
-    tags = listOf("Kotlin", "Typescript", "Typescript-definitions", "Generator", "Typescript-generator")
-} */
+
+    plugins {
+        create("ktsgenerator") {
+            id = "ch.ayedo.ktsgenerator"
+            implementationClass = "ch.ayedo.ktsgenerator.TypeScriptGeneratorPlugin"
+            displayName = "ktsgenerator"
+            description = "Plugin to generate Typescript definitions from Kotlin classes."
+            version = version
+            tags = listOf("Kotlin", "Typescript", "Typescript-definitions", "Generator", "Typescript-generator")
+        }
+    }
+}
