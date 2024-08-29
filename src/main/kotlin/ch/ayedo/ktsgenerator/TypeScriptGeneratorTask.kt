@@ -44,10 +44,8 @@ open class TypeScriptGeneratorTask : DefaultTask() {
 
         val classLoader = URLClassLoader(urls.toTypedArray())
 
-        @Suppress("UnstableApiUsage")
         val javaClasses = ClassPath.from(classLoader).getTopLevelClassesRecursive(packageName)
 
-        @Suppress("UnstableApiUsage")
         val kotlinClasses = javaClasses.map { it.load() }.map { it.kotlin }
 
         val filteredKotlinClasses =

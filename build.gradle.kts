@@ -25,18 +25,12 @@ tasks.test {
 
 dependencies {
     implementation("com.github.ntrrgc", "ts-generator", "1.1.1")
-    implementation("com.google.guava", "guava", "27.0.1-jre")
+    implementation("com.google.guava", "guava", "33.3.0-jre")
 
-    /* compile(gradleApi())
-
-    compile(kotlin("stdlib-jdk8"))
-
-
-    compile("org.jetbrains.kotlin","kotlin-reflect", "1.3.50")
-
-    testImplementation("org.assertj", "assertj-core", "3.12.2")
-    testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.5.2")
-    testRuntime("org.junit.jupiter","junit-jupiter-engine", "5.5.2") */
+    // Testing
+    val junitVersion = "5.8.2"
+    testImplementation("org.junit.jupiter", "junit-jupiter-api", junitVersion)
+    testImplementation("org.junit.jupiter","junit-jupiter-engine", junitVersion)
 }
 
 /* tasks.withType<KotlinCompile> {
